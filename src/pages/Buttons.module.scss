@@ -1,0 +1,8 @@
+.setOfButtons {
+  display: flex;
+  gap: var(--spacer);
+  flex-wrap: wrap;
+}
+.fixedButton {
+  width: 150px;
+}

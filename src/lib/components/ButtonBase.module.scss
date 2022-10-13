@@ -1,0 +1,63 @@
+.root {
+  text-decoration: none;
+  height: var(--buttonHeight);
+  background-color: var(--buttonBgColor);
+  color: var(--buttonColor);
+  border: var(--buttonBorderWidth) var(--buttonBorderStyle)
+    var(--buttonBorderColor);
+  border-radius: var(--buttonBorderRadius);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--buttonFontSize);
+  box-sizing: border-box;
+  padding-block: 0;
+  padding-inline: var(--buttonPaddingInline);
+  outline: none;
+  cursor: pointer;
+  &:hover {
+    border-color: var(--buttonHoverBorderColor);
+    background-color: var(--buttonHoverBgColor);
+  }
+  &:focus {
+    border-color: var(--buttonActiveBorderColor);
+    background-color: var(--buttonActiveBgColor);
+  }
+  > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+  &.btn--lg {
+    height: var(--buttonLgHeight);
+  }
+  &.btn--sm {
+    height: var(--buttonSmHeight);
+  }
+  // From this we'll use common variables, in case if we'll need to change
+  // some styles in some theme right in button we'll add more variables
+  &.btn--primary {
+    color: var(--bgColor);
+    background-color: var(--primaryColor);
+    border-color: var(--primaryColor);
+    &:hover {
+      background-color: var(--primaryAccentColor);
+      border-color: var(--primaryAccentColor);
+    }
+    &:focus {
+      background-color: var(--primaryAccentColor);
+      border-color: var(--primaryAccentColor);
+    }
+  }
+  &.btn--light {
+    color: var(--accentColor);
+    background-color: var(--bgAccentColor);
+    border-color: var(--accentColor);
+    &:hover {
+      background-color: var(--bgHoverColor);
+    }
+    &:focus {
+      background-color: var(--bgHoverColor);
+    }
+  }
+}

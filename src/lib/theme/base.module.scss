@@ -1,0 +1,42 @@
+.root {
+    --componentHeight: 36px;
+    --componentHeightSm: 28px;
+    --componentHeightLg: 52px;
+    --spacer: 8px;
+    --fontSize: 14px;
+
+    --bgColor: #ffffff;
+    --bgAccentColor: #D6EF9F;
+    --bgHoverColor: #92D18B;
+    --fgColor: #000000;
+    --accentColor: #074600;
+    --hoverColor: #1A6811;
+    --warningColor: #7D151A;
+    --errorColor: #530004;
+    --primaryColor: #641144;
+    --primaryAccentColor: #430029;
+
+    --borderRadius: 4px;
+    --borderColor: var(--fgColor);
+    --borderColorActive: var(--accentColor);
+    --borderColorHover: var(--hoverColor);
+
+    // the next example, how we could add separated variables for
+    // each component, with dependencies from common variables
+    --buttonHeight: var(--componentHeight);
+    --buttonBorderRadius: var(--borderRadius);
+    --buttonBorderWidth: 1px;
+    --buttonBorderStyle: solid;
+    --buttonBorderColor: var(--borderColor);
+    --buttonActiveBorderColor: var(--borderColorActive);
+    --buttonHoverBorderColor: var(--borderColorHover);
+    --buttonFontSize: var(--fontSize);
+    --buttonPaddingInline: var(--spacer);
+    --buttonBgColor: var(--bgColor);
+    --buttonActiveBgColor: var(--bgAccentColor);
+    --buttonHoverBgColor: var(--bgHoverColor);
+    --buttonLgHeight: var(--componentHeightLg);
+    --buttonSmHeight: var(--componentHeightSm);
+    --buttonColor: var(--fgColor);
+
+}

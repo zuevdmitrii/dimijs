@@ -1,0 +1,6 @@
+@import './Button.module.scss';
+
+.svgIcon {
+  margin-right: calc(var(--spacer) / 2);
+  flex-shrink: 0;
+}
