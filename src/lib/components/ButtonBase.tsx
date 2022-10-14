@@ -13,14 +13,15 @@ export interface IButtonBaseProps {
   color?: 'primary' | 'light';
 }
 export const ButtonBase = (props: IButtonBaseProps) => {
-  const onClick = useCallback(
+  const {onClick} = props;
+  const onClickHdl = useCallback(
     (ev: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      if (props.onClick) {
+      if (onClick) {
         ev.stopPropagation();
-        props.onClick();
+        onClick();
       }
     },
-    [props.onClick]
+    [onClick]
   );
   const tagProps = {
     className: cn(
@@ -30,7 +31,7 @@ export const ButtonBase = (props: IButtonBaseProps) => {
       props.color && styles[`btn--${props.color}`],
     ),
     'area-label': props.ariaLabel,
-    onClick,
+    onClick: onClickHdl,
   };
   if (props.href) {
     return (
