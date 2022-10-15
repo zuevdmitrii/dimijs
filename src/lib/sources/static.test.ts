@@ -1,5 +1,6 @@
 import {
   CrudAggregation,
+  CrudErrorCodes,
   CrudEvents,
   CrudFilterFieldTypes,
   CrudFilterOperator,
@@ -47,6 +48,9 @@ test('delete from static source', async () => {
   await s.delete(1);
   const row = await s.read(1);
   expect(row).toBeNull();
+  const result = await s.delete(1);
+  expect(result.errorCode).toBe(CrudErrorCodes.ERROR);
+  expect(result.errorMessage).toContain('Not found by id');
 });
 
 test('update value in static', async () => {
@@ -70,6 +74,9 @@ test('update value in static', async () => {
   await s.update({id: 2, value: undefined});
   row = (await s.read(2)) as ITestData;
   expect(row.value).toBeUndefined();
+  const result = await s.update({id: 25, title: 'no row'});
+  expect(result.errorCode).toBe(CrudErrorCodes.ERROR);
+  expect(result.errorMessage).toContain('Not found by id');
 });
 
 test('list methods', async () => {
@@ -178,6 +185,61 @@ test('list methods', async () => {
     [{field: 'title', direction: 'DESC'}]
   )) as ICrudList<ITestData>;
   expect(list.data.map(item=>item.id).join('.')).toBe('9.8.7.6.5');
+  list = (await s.list(
+    [{
+      field: 'id',
+      operator: CrudFilterOperator.LT,
+      value: 8,
+      type: CrudFilterFieldTypes.Field,
+    }],
+    {page: 0, countOnPage: 100},
+    [{field: 'id'}]
+  )) as ICrudList<ITestData>;
+  expect(list.data.map(item=>item.id).join('.')).toBe('0.1.2.3.4.5.6.7');
+  list = (await s.list(
+    [{
+      field: 'id',
+      operator: CrudFilterOperator.LTE,
+      value: 8,
+      type: CrudFilterFieldTypes.Field,
+    }],
+    {page: 0, countOnPage: 100},
+    [{field: 'id'}]
+  )) as ICrudList<ITestData>;
+  expect(list.data.map(item=>item.id).join('.')).toBe('0.1.2.3.4.5.6.7.8');
+  list = (await s.list(
+    [{
+      field: 'id',
+      operator: CrudFilterOperator.GT,
+      value: 8,
+      type: CrudFilterFieldTypes.Field,
+    }],
+    {page: 0, countOnPage: 100},
+    [{field: 'id'}]
+  )) as ICrudList<ITestData>;
+  expect(list.data.map(item=>item.id).join('.')).toBe('9');
+  list = (await s.list(
+    [{
+      field: 'id',
+      operator: CrudFilterOperator.GTE,
+      value: 8,
+      type: CrudFilterFieldTypes.Field,
+    }],
+    {page: 0, countOnPage: 100},
+    [{field: 'id'}]
+  )) as ICrudList<ITestData>;
+  expect(list.data.map(item=>item.id).join('.')).toBe('8.9');
+  list = (await s.list(
+    [{
+      field: 'id',
+      operator: CrudFilterOperator.LIKE,
+      value: '1',
+      type: CrudFilterFieldTypes.Field,
+    }],
+    {page: 0, countOnPage: 100},
+    [{field: 'id'}]
+  )) as ICrudList<ITestData>;
+  expect(list.data.map(item=>item.id).join('.')).toBe('');
 });
 
 test('events static', async () => {

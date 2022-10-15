@@ -1,0 +1,11 @@
+.listDemo {  
+  margin-bottom: var(--spacer);
+  > form {
+    display: flex;
+    gap: var(--spacer);
+  }
+}
+.simpleGrid {
+  display: grid;
+  grid-template-columns: 40px 300px 20px;
+}

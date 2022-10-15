@@ -1,0 +1,12 @@
+.setOfInputs {
+  display: flex;
+  gap: var(--spacer);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacer);
+}
+.inputW150 {
+  width: 150px;
+}
+.inputW300 {
+  width: 300px;
+}

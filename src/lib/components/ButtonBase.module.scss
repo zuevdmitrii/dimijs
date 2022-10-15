@@ -34,6 +34,16 @@
   &.btn--sm {
     height: var(--buttonSmHeight);
   }
+  &.btn--disabled {
+    cursor: default;
+    border-color: var(--disabledColor);
+    color: var(--disabledColor);
+    &:hover, &:focus {
+      border-color: var(--disabledColor);
+      color: var(--disabledColor);
+      background-color: var(--buttonBgColor);
+    }
+  }
   // From this we'll use common variables, in case if we'll need to change
   // some styles in some theme right in button we'll add more variables
   &.btn--primary {
@@ -48,6 +58,11 @@
       background-color: var(--primaryAccentColor);
       border-color: var(--primaryAccentColor);
     }
+    &.btn--disabled {
+      cursor: default;
+      border-color: var(--disabledColor);
+      color: var(--disabledColor);
+    }
   }
   &.btn--light {
     color: var(--accentColor);
@@ -58,6 +73,11 @@
     }
     &:focus {
       background-color: var(--bgHoverColor);
+    }
+    &.btn--disabled {
+      cursor: default;
+      border-color: var(--disabledColor);
+      color: var(--disabledColor);
     }
   }
 }

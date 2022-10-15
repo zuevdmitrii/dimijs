@@ -27,7 +27,7 @@ export type ICrudFilterField<ItemType, T extends keyof ItemType> = {
   operator?: CrudFilterOperator;
   field: T;
   value: ItemType[T];
-  type: CrudFilterFieldTypes.Field,
+  type: CrudFilterFieldTypes.Field;
 };
 
 export interface ICrudAggregationFilterField<ItemType> {

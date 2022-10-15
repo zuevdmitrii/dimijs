@@ -36,7 +36,7 @@ export const IconButton: <T extends iconTypes>(
           {...size}
           className={styles.svgIcon}
         />
-        <span>{props.caption}</span>
+        {props.caption && <span>{props.caption}</span>}
       </>
     </ButtonBase>
   );

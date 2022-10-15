@@ -21,6 +21,7 @@ export class Static<ItemType, KeyFieldType>
   private eventEmitter = new EventEmitter<{
     [Property in CrudEvents]: Property;
   }>();
+  public delay:number = 0;
   constructor(keyField: keyof ItemType, initialData?: ItemType[]) {
     this.data = initialData?.slice() || [];
     this.keyField = keyField;
@@ -42,7 +43,7 @@ export class Static<ItemType, KeyFieldType>
         resolve({
           errorCode: CrudErrorCodes.OK,
         });
-      }, 0);
+      }, this.delay);
     });
   };
   read: (id: KeyFieldType) => Promise<ItemType | ICrudStatus | null> = (id) => {
@@ -55,45 +56,49 @@ export class Static<ItemType, KeyFieldType>
     [Property in keyof ItemType]+?: ItemType[Property] | undefined;
   }) => Promise<ICrudStatus> = (data) => {
     return new Promise((resolve) => {
-      const rowIndex = this.data.findIndex(
-        (item) => item[this.keyField] === data[this.keyField]
-      );
-      if (rowIndex === -1) {
-        resolve({
-          errorCode: CrudErrorCodes.ERROR,
-          errorMessage: `Not found by ${this.keyField.toString()}`,
-        });
-      } else {
-        this.data[rowIndex] = {
-          ...this.data[rowIndex],
-          ...data,
-        };
-        this.eventEmitter.fire(CrudEvents.onUpdate, [this.data[rowIndex]]);
-        resolve({errorCode: CrudErrorCodes.OK});
-      }
+      setTimeout(()=>{
+        const rowIndex = this.data.findIndex(
+          (item) => item[this.keyField] === data[this.keyField]
+        );
+        if (rowIndex === -1) {
+          resolve({
+            errorCode: CrudErrorCodes.ERROR,
+            errorMessage: `Not found by ${this.keyField.toString()}`,
+          });
+        } else {
+          this.data[rowIndex] = {
+            ...this.data[rowIndex],
+            ...data,
+          };
+          this.eventEmitter.fire(CrudEvents.onUpdate, [this.data[rowIndex]]);
+          resolve({errorCode: CrudErrorCodes.OK});
+        }
+      }, this.delay);
     });
   };
   delete: (id: KeyFieldType) => Promise<ICrudStatus> = (id) => {
     return new Promise((resolve) => {
-      const rowIndex = this.data.findIndex(
-        (item) => item[this.keyField] === id
-      );
-      if (rowIndex === -1) {
-        resolve({
-          errorCode: CrudErrorCodes.ERROR,
-          errorMessage: `Not found by ${this.keyField.toString()}`,
-        });
-      } else {
-        const deleted = this.data.splice(rowIndex, 1);
-        this.eventEmitter.fire(CrudEvents.onDelete, deleted);
-        resolve({errorCode: CrudErrorCodes.OK});
-      }
+      setTimeout(()=>{
+        const rowIndex = this.data.findIndex(
+          (item) => item[this.keyField] === id
+        );
+        if (rowIndex === -1) {
+          resolve({
+            errorCode: CrudErrorCodes.ERROR,
+            errorMessage: `Not found by ${this.keyField.toString()}`,
+          });
+        } else {
+          const deleted = this.data.splice(rowIndex, 1);
+          this.eventEmitter.fire(CrudEvents.onDelete, deleted);
+          resolve({errorCode: CrudErrorCodes.OK});
+        }
+      }, this.delay);
     });
   };
   list: (
     filter: ICrudFilter<ItemType>[],
     pagination: ICrudPagination,
-    sorting?: ICrudSorting<ItemType>[] | undefined
+    sorting?: ICrudSorting<ItemType>[],
   ) => Promise<ICrudStatus | ICrudList<ItemType>> = (
     filter,
     pagination,
@@ -169,12 +174,14 @@ export class Static<ItemType, KeyFieldType>
         startIndex,
         startIndex + pagination.countOnPage
       );
-      resolve({
-        data: result,
-        meta: {
-          hasNextPage: !!filtered[startIndex + pagination.countOnPage],
-        },
-      });
+      setTimeout(()=>{
+        resolve({
+          data: result,
+          meta: {
+            hasNextPage: !!filtered[startIndex + pagination.countOnPage],
+          },
+        });
+      }, this.delay);
     });
   };
 }
