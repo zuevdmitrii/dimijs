@@ -42,7 +42,7 @@ export const Lists = () => {
       source.on(CrudEvents.onUpdate, upList),
     ];
     return () => void unsubscribes.forEach((f) => f());
-  }, []);
+  }, [source]);
   return (
     <Template>
       <>
