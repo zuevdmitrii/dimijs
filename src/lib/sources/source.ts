@@ -48,7 +48,7 @@ export interface ICrudSorting<ItemType> {
 }
 export interface ICrudList<ItemType> {
   data: ItemType[];
-  meta: {
+  meta?: {
     hasNextPage?: boolean;
   };
 }
@@ -59,6 +59,7 @@ export enum CrudEvents {
 }
 
 export interface ISource<ItemType, KeyFieldType> {
+  keyField: keyof ItemType;
   create: (items: ItemType[]) => Promise<ICrudStatus>;
   read: (id: KeyFieldType) => Promise<ItemType | ICrudStatus | null>;
   update: (data: {
@@ -70,6 +71,12 @@ export interface ISource<ItemType, KeyFieldType> {
     pagination: ICrudPagination,
     sorting?: ICrudSorting<ItemType>[],
   ) => Promise<ICrudList<ItemType> | ICrudStatus>;
+  // return data from local cache syncroniously for using in component render
+  getSerializationData: (
+    filter: ICrudFilter<ItemType>[],
+    pagination: ICrudPagination,
+    sorting?: ICrudSorting<ItemType>[],
+  ) => ICrudList<ItemType>|ICrudStatus|null;
   on: (
     event: CrudEvents,
     callback: (

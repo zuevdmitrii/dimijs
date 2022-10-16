@@ -17,21 +17,54 @@ export class Static<ItemType, KeyFieldType>
   implements ISource<ItemType, KeyFieldType>
 {
   private data = [] as ItemType[];
-  private keyField: keyof ItemType;
+  private cache = {} as {[propname: string]: ICrudList<ItemType> | ICrudStatus};
+  public keyField: keyof ItemType;
   private eventEmitter = new EventEmitter<{
     [Property in CrudEvents]: Property;
   }>();
-  public delay:number = 0;
-  constructor(keyField: keyof ItemType, initialData?: ItemType[]) {
-    this.data = initialData?.slice() || [];
+  public delay: number = 0;
+  constructor(
+    keyField: keyof ItemType,
+    deserializedData?: {
+      data: ICrudList<ItemType> | ICrudStatus;
+      filter?: ICrudFilter<ItemType>[];
+      pagination?: ICrudPagination;
+      sorting?: ICrudSorting<ItemType>[];
+    }
+  ) {
+    if (
+      deserializedData?.data &&
+      (deserializedData?.data as ICrudList<ItemType>).data
+    ) {
+      this.data = (deserializedData.data as ICrudList<ItemType>).data.slice();
+    } else {
+      this.data = [];
+    }
     this.keyField = keyField;
+    if (
+      deserializedData &&
+      deserializedData.pagination &&
+      deserializedData.filter
+    ) {
+      const {filter, pagination, sorting} = deserializedData;
+      this.cache[JSON.stringify({filter, pagination, sorting})] =
+        deserializedData.data;
+    }
   }
+  getSerializationData: (
+    filter: ICrudFilter<ItemType>[],
+    pagination: ICrudPagination,
+    sorting?: ICrudSorting<ItemType>[]
+  ) => ICrudList<ItemType> | ICrudStatus | null = (
+    filter,
+    pagination,
+    sorting
+  ) => {
+    return this.cache[JSON.stringify({filter, pagination, sorting})] || null;
+  };
   on: (
     event: CrudEvents,
-    callback: (
-      event: CrudEvents,
-      data: ItemType[]
-    ) => void
+    callback: (event: CrudEvents, data: ItemType[]) => void
   ) => () => void = (event, callback) => {
     return this.eventEmitter.on(event, callback);
   };
@@ -56,7 +89,7 @@ export class Static<ItemType, KeyFieldType>
     [Property in keyof ItemType]+?: ItemType[Property] | undefined;
   }) => Promise<ICrudStatus> = (data) => {
     return new Promise((resolve) => {
-      setTimeout(()=>{
+      setTimeout(() => {
         const rowIndex = this.data.findIndex(
           (item) => item[this.keyField] === data[this.keyField]
         );
@@ -78,7 +111,7 @@ export class Static<ItemType, KeyFieldType>
   };
   delete: (id: KeyFieldType) => Promise<ICrudStatus> = (id) => {
     return new Promise((resolve) => {
-      setTimeout(()=>{
+      setTimeout(() => {
         const rowIndex = this.data.findIndex(
           (item) => item[this.keyField] === id
         );
@@ -98,7 +131,7 @@ export class Static<ItemType, KeyFieldType>
   list: (
     filter: ICrudFilter<ItemType>[],
     pagination: ICrudPagination,
-    sorting?: ICrudSorting<ItemType>[],
+    sorting?: ICrudSorting<ItemType>[]
   ) => Promise<ICrudStatus | ICrudList<ItemType>> = (
     filter,
     pagination,
@@ -174,13 +207,15 @@ export class Static<ItemType, KeyFieldType>
         startIndex,
         startIndex + pagination.countOnPage
       );
-      setTimeout(()=>{
-        resolve({
+      setTimeout(() => {
+        const forReturn = {
           data: result,
           meta: {
             hasNextPage: !!filtered[startIndex + pagination.countOnPage],
           },
-        });
+        };
+        this.cache[JSON.stringify({filter, pagination, sorting})] = forReturn;
+        resolve(forReturn);
       }, this.delay);
     });
   };
