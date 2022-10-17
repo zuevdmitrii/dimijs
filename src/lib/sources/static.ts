@@ -36,10 +36,12 @@ export class Static<ItemType, KeyFieldType>
       this.data = [];
     }
   }
-  create: (items: ItemType[]) => Promise<ICrudStatus> = (items) => {
+  create: (items: {
+    [Property in keyof ItemType]+?: ItemType[Property];
+  }[]) => Promise<ICrudStatus> = (items) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        this.data = this.data.concat(items);
+        this.data = this.data.concat(items as ItemType[]);
         this.eventEmitter.fire(CrudEvents.onCreate, items);
         resolve({
           errorCode: CrudErrorCodes.OK,

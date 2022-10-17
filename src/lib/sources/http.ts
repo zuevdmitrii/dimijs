@@ -16,8 +16,10 @@ export class Http<ItemType, KeyFieldType> extends Source<
   // will be '${httpEndPoint}/{create|read|update|list}?'
   // create, delete and update = post methods
   // read, list = get
-  private httpEndPoint: string = '/crud';
-  create: (items: ItemType[]) => Promise<ICrudStatus> = (items) => {
+  public httpEndPoint: string = '/crud';
+  create: (items: {
+    [Property in keyof ItemType]+?: ItemType[Property];
+  }[]) => Promise<ICrudStatus> = (items) => {
     return fetch(`${this.httpEndPoint}/create`, {
       method: 'POST',
       body: encodeURIComponent(JSON.stringify(items)),

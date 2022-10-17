@@ -63,7 +63,9 @@ export enum CrudEvents {
 
 export interface ISource<ItemType, KeyFieldType> {
   keyField: keyof ItemType;
-  create: (items: ItemType[]) => Promise<ICrudStatus>;
+  create: (items: {
+    [Property in keyof ItemType]+?: ItemType[Property];
+  }[]) => Promise<ICrudStatus>;
   read: (id: KeyFieldType) => Promise<ItemType | ICrudStatus | null>;
   update: (data: {
     [Property in keyof ItemType]+?: ItemType[Property];
@@ -134,7 +136,9 @@ export class Source<ItemType, KeyFieldType>
   ) => () => void = (event, callback) => {
     return this.eventEmitter.on(event, callback);
   };
-  create: (items: ItemType[]) => Promise<ICrudStatus> = () => {
+  create: (items: {
+    [Property in keyof ItemType]+?: ItemType[Property];
+  }[]) => Promise<ICrudStatus> = () => {
     throw new Error('Not implemeted');
   };
   read: (id: KeyFieldType) => Promise<ItemType | ICrudStatus | null> = () => {
