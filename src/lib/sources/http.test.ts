@@ -23,6 +23,8 @@ const server = setupServer(
   rest.post('/crud/delete', async (req, res, ctx) => {
     const body = JSON.parse(decodeURIComponent(await req.text()));
     if (body.id === 2) return res(ctx.status(500, 'row not found'));
+    if (body.id === 3)
+      return res(ctx.json({errorCode: 1, errorMessage: 'err msg with 200'}));
     return res(ctx.json({id: 1, title: 'test'}));
   }),
   rest.get('/crud/list', async (req, res, ctx) => {
@@ -93,6 +95,10 @@ test('delete row error', async () => {
   const res = await s.delete(2);
   expect(res.errorCode).toBe(CrudErrorCodes.ERROR);
   expect(res.errorMessage).toBe('row not found');
+  expect(deleted).toBe(undefined);
+  const res2 = await s.delete(3);
+  expect(res2.errorCode).toBe(CrudErrorCodes.ERROR);
+  expect(res2.errorMessage).toBe('err msg with 200');
   expect(deleted).toBe(undefined);
 });
 
