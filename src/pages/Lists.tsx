@@ -8,6 +8,7 @@ import {
   CrudEvents,
   ICrudList,
   ICrudStatus,
+  ISource,
 } from '../lib/sources/source';
 import {Static} from '../lib/sources/static';
 import styles from './Lists.module.scss';
@@ -17,6 +18,28 @@ interface IDemoData {
   id: number;
   value: string;
 }
+
+const RowTemplate = ({
+  item,
+  source,
+}: {
+  item: IDemoData;
+  source: ISource<IDemoData, number>;
+}) => (
+  <>
+    <div>{item.id}</div>
+    <div>{item.value}</div>
+    <div>
+      <IconButton
+        size="sm"
+        iconSetName="action"
+        iconId="delete"
+        caption=""
+        onClick={() => source.delete(item.id)}
+      />
+    </div>
+  </>
+);
 
 export const Lists = () => {
   const staticPagination = useMemo(() => ({page: 0, countOnPage: 20}), []);
@@ -29,8 +52,11 @@ export const Lists = () => {
   const source2 = useMemo(() => {
     const listSource = new Static<IDemoData, number>('id', {
       data: {
-        data: [{id: 1, value: 'test'}, {id: 2, value: 'test2'}],
-      }
+        data: [
+          {id: 1, value: 'test'},
+          {id: 2, value: 'test2'},
+        ],
+      },
     });
     // non SOLID, only for test UI
     listSource.delay = 1000;
@@ -39,7 +65,10 @@ export const Lists = () => {
   const source3 = useMemo(() => {
     const listSource = new Static<IDemoData, number>('id', {
       data: {
-        data: [{id: 1, value: 'test'}, {id: 2, value: 'test2'}],
+        data: [
+          {id: 1, value: 'test'},
+          {id: 2, value: 'test2'},
+        ],
       },
       pagination: staticPagination,
       filter: [],
@@ -52,26 +81,6 @@ export const Lists = () => {
   const [uiDisabled, setUiDisabled] = useState(false);
   const [lastId, setLastId] = useState(0);
   const [list, setList] = useState<IDemoData[]>([]);
-  const RowTemplate = useMemo(
-    () =>
-      ({item}: {item: IDemoData}) =>
-        (
-          <>
-            <div>{item.id}</div>
-            <div>{item.value}</div>
-            <div>
-              <IconButton
-                size="sm"
-                iconSetName="action"
-                iconId="delete"
-                caption=""
-                onClick={() => source.delete(item.id)}
-              />
-            </div>
-          </>
-        ),
-    [source]
-  );
   useEffect(() => {
     const upList = async () => {
       const newList = await source.list([], {page: 0, countOnPage: 100});
@@ -131,7 +140,7 @@ export const Lists = () => {
           </div>
           <h3>The same source but with lists/Base</h3>
           <div className={styles.simpleGrid}>
-            <Base
+            <Base<IDemoData, number>
               source={source}
               RowTemplate={RowTemplate}
               pagination={staticPagination}
