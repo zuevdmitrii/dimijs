@@ -59,6 +59,7 @@ export enum CrudEvents {
   onCreate = 'onCreate',
   onDelete = 'onDelete',
   onUpdate = 'onUpdate',
+  onChangeCustomQueryParams = 'onChangeCustomQueryParams'
 }
 
 export interface ISource<ItemType, KeyFieldType> {

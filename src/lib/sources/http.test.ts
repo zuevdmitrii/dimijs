@@ -197,7 +197,12 @@ test('custom params', async () => {
   expect((listRes as ICrudStatus).errorMessage).toBe(
     'list called with custom param'
   );
+  let onChangeCustomQueryParamsCalled = false;
+  s.on(CrudEvents.onChangeCustomQueryParams, ()=>{
+    onChangeCustomQueryParamsCalled = true;
+  });
   s.setCustomQueryParams({});
+  expect(onChangeCustomQueryParamsCalled).toBeTruthy();
   readRes = await s.read(1);
   expect(readRes).toMatchSnapshot();
 });

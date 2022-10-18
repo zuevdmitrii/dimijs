@@ -29,6 +29,7 @@ export class Http<ItemType, KeyFieldType> extends Source<
       )}`;
     });
     if (this.queryLine) this.queryLine = `?${this.queryLine}`;
+    this.eventEmitter.fire(CrudEvents.onChangeCustomQueryParams);
   };
   create: (
     items: {
