@@ -13,14 +13,29 @@ export class Http<ItemType, KeyFieldType> extends Source<
   ItemType,
   KeyFieldType
 > {
+  private customQueryParams: {[propname: string]: string} = {};
+  private queryLine = '';
   // will be '${httpEndPoint}/{create|read|update|list}?'
   // create, delete and update = post methods
   // read, list = get
   public httpEndPoint: string = '/crud';
-  create: (items: {
-    [Property in keyof ItemType]+?: ItemType[Property];
-  }[]) => Promise<ICrudStatus> = (items) => {
-    return fetch(`${this.httpEndPoint}/create`, {
+  public setCustomQueryParams = (params: {[propname: string]: string}) => {
+    this.customQueryParams = params;
+    this.queryLine = '';
+    Object.keys(this.customQueryParams).forEach((p) => {
+      if (this.queryLine) this.queryLine += '&';
+      this.queryLine += `${encodeURIComponent(p)}=${encodeURIComponent(
+        this.customQueryParams[p]
+      )}`;
+    });
+    if (this.queryLine) this.queryLine = `?${this.queryLine}`;
+  };
+  create: (
+    items: {
+      [Property in keyof ItemType]+?: ItemType[Property];
+    }[]
+  ) => Promise<ICrudStatus> = (items) => {
+    return fetch(`${this.httpEndPoint}/create${this.queryLine}`, {
       method: 'POST',
       body: encodeURIComponent(JSON.stringify(items)),
     })
@@ -38,9 +53,11 @@ export class Http<ItemType, KeyFieldType> extends Source<
   };
   read: (id: KeyFieldType) => Promise<ItemType | ICrudStatus | null> = (id) => {
     return fetch(
-      `${this.httpEndPoint}/read?${encodeURIComponent(
-        String(this.keyField)
-      )}=${encodeURIComponent(String(id))}`,
+      `${this.httpEndPoint}/read${
+        this.queryLine ? `${this.queryLine}&` : '?'
+      }${encodeURIComponent(String(this.keyField))}=${encodeURIComponent(
+        String(id)
+      )}`,
       {
         method: 'GET',
       }
@@ -56,7 +73,7 @@ export class Http<ItemType, KeyFieldType> extends Source<
   update: (data: {
     [Property in keyof ItemType]+?: ItemType[Property] | undefined;
   }) => Promise<ICrudStatus> = (data) => {
-    return fetch(`${this.httpEndPoint}/update`, {
+    return fetch(`${this.httpEndPoint}/update${this.queryLine}`, {
       method: 'POST',
       body: encodeURIComponent(JSON.stringify(data)),
     })
@@ -73,7 +90,7 @@ export class Http<ItemType, KeyFieldType> extends Source<
       });
   };
   delete: (id: KeyFieldType) => Promise<ICrudStatus> = (id) => {
-    return fetch(`${this.httpEndPoint}/delete`, {
+    return fetch(`${this.httpEndPoint}/delete${this.queryLine}`, {
       method: 'POST',
       body: encodeURIComponent(JSON.stringify({[this.keyField]: id})),
     })
@@ -82,8 +99,7 @@ export class Http<ItemType, KeyFieldType> extends Source<
         throw new Error(response.statusText);
       })
       .then((deleted) => {
-        if ((deleted as ICrudStatus).errorCode)
-          return deleted;
+        if ((deleted as ICrudStatus).errorCode) return deleted;
         this.eventEmitter.fire(CrudEvents.onDelete, [deleted]);
         return {errorCode: CrudErrorCodes.OK};
       })
@@ -101,7 +117,9 @@ export class Http<ItemType, KeyFieldType> extends Source<
     sorting
   ) => {
     return fetch(
-      `${this.httpEndPoint}/list?params=${encodeURIComponent(
+      `${this.httpEndPoint}/list${
+        this.queryLine ? `${this.queryLine}&` : '?'
+      }params=${encodeURIComponent(
         JSON.stringify({filter, pagination, sorting})
       )}`,
       {
