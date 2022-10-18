@@ -82,6 +82,8 @@ export class Http<ItemType, KeyFieldType> extends Source<
         throw new Error(response.statusText);
       })
       .then((deleted) => {
+        if ((deleted as ICrudStatus).errorCode)
+          return deleted;
         this.eventEmitter.fire(CrudEvents.onDelete, [deleted]);
         return {errorCode: CrudErrorCodes.OK};
       })

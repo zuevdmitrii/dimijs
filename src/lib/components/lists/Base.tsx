@@ -15,7 +15,10 @@ interface IBaseProps<ItemType, KeyFieldType> {
   filter?: ICrudFilter<ItemType>[];
   pagination: ICrudPagination;
   sorting?: ICrudSorting<ItemType>[];
-  RowTemplate: (props: {item: ItemType}) => JSX.Element;
+  RowTemplate: (props: {
+    item: ItemType;
+    source: ISource<ItemType, KeyFieldType>;
+  }) => JSX.Element;
   PreloadTemplate?: () => JSX.Element;
   ErrorTemplate?: (props: {error: ICrudStatus}) => JSX.Element;
 }
@@ -52,14 +55,10 @@ export const Base: <ItemType, KeyFieldType>(
   const [isFirstRender, setIsFirstRender] = useState(true);
   useEffect(() => {
     const upList = async () => {
-      const newList = await source.list(
-        filter || [],
-        pagination,
-        sorting
-      );
+      const newList = await source.list(filter || [], pagination, sorting);
       if ((newList as ICrudStatus).errorCode) {
         setList([]);
-        setError((newList as ICrudStatus));
+        setError(newList as ICrudStatus);
       } else {
         setError({errorCode: CrudErrorCodes.OK});
         setList((newList as ICrudList<ItemType>).data);
@@ -86,7 +85,13 @@ export const Base: <ItemType, KeyFieldType>(
   return (
     <>
       {list.map((row) => {
-        return <RowTemplate item={row} key={String(row[source.keyField])} />;
+        return (
+          <RowTemplate
+            item={row}
+            key={String(row[source.keyField])}
+            source={source}
+          />
+        );
       })}
     </>
   );
