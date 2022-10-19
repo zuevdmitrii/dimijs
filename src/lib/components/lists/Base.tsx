@@ -69,6 +69,7 @@ export const Base: <ItemType, KeyFieldType>(
       source.on(CrudEvents.onCreate, upList),
       source.on(CrudEvents.onDelete, upList),
       source.on(CrudEvents.onUpdate, upList),
+      source.on(CrudEvents.onChangeCustomQueryParams, upList),
     ];
     if (isFirstRender && !hasData) {
       setIsFirstRender(false);
