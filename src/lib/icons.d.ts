@@ -1,5 +1,5 @@
 type iconTypes = 'navigation' | 'action';
 type listOfIcons = {
-  navigation: 'expandMore'|'chevronLeft';
+  navigation: 'expandMore'|'chevronLeft'|'chevronRight';
   action: 'search'|'delete';
 };

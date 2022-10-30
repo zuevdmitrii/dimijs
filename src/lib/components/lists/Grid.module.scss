@@ -1,0 +1,7 @@
+.root {
+  
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columnCount), 1fr);
+}

@@ -12,9 +12,10 @@ import {
   Source,
 } from './source';
 
-export class Static<ItemType, KeyFieldType>
-  extends Source<ItemType, KeyFieldType>
-{
+export class Static<ItemType, KeyFieldType> extends Source<
+  ItemType,
+  KeyFieldType
+> {
   private data = [] as ItemType[];
   public delay: number = 0;
   constructor(
@@ -32,13 +33,22 @@ export class Static<ItemType, KeyFieldType>
       (deserializedData?.data as ICrudList<ItemType>).data
     ) {
       this.data = (deserializedData.data as ICrudList<ItemType>).data.slice();
+      if (deserializedData.pagination) {
+        this.list(
+          deserializedData.filter || [],
+          deserializedData.pagination,
+          deserializedData.sorting
+        );
+      }
     } else {
       this.data = [];
     }
   }
-  create: (items: {
-    [Property in keyof ItemType]+?: ItemType[Property];
-  }[]) => Promise<ICrudStatus> = (items) => {
+  create: (
+    items: {
+      [Property in keyof ItemType]+?: ItemType[Property];
+    }[]
+  ) => Promise<ICrudStatus> = (items) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         this.data = this.data.concat(items as ItemType[]);
@@ -107,6 +117,7 @@ export class Static<ItemType, KeyFieldType>
     pagination,
     sorting
   ) => {
+    const localCacheKey = JSON.stringify({filter, pagination, sorting});
     const generateFilterFunction: (
       filter: ICrudFilter<ItemType>[],
       agg: CrudAggregation
@@ -177,14 +188,14 @@ export class Static<ItemType, KeyFieldType>
         startIndex,
         startIndex + pagination.countOnPage
       );
+      const forReturn = {
+        data: result,
+        meta: {
+          hasNextPage: !!filtered[startIndex + pagination.countOnPage],
+        },
+      };
+      this.cache[localCacheKey] = forReturn;
       setTimeout(() => {
-        const forReturn = {
-          data: result,
-          meta: {
-            hasNextPage: !!filtered[startIndex + pagination.countOnPage],
-          },
-        };
-        this.cache[JSON.stringify({filter, pagination, sorting})] = forReturn;
         resolve(forReturn);
       }, this.delay);
     });

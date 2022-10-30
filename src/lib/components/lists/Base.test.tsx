@@ -3,7 +3,6 @@ import {act, render, screen, waitFor} from '@testing-library/react';
 import {Base} from './Base';
 import {Static} from '../../sources/static';
 import {CrudErrorCodes} from '../../sources/source';
-import {resolve} from 'node:path/win32';
 
 interface IDemoData {
   id: number;
